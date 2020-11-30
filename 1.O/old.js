@@ -18,7 +18,43 @@ var Dog = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(Dog.prototype, "makeSound", {
+        get: function () {
+            return 'Woef';
+        },
+        enumerable: false,
+        configurable: true
+    });
     return Dog;
+}());
+var Bear = /** @class */ (function () {
+    function Bear() {
+    }
+    Object.defineProperty(Bear.prototype, "name", {
+        get: function () {
+            return this._name;
+        },
+        set: function (value) {
+            this._name = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Bear.prototype, "type", {
+        get: function () {
+            return 'bear';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Bear.prototype, "makeSound", {
+        get: function () {
+            return 'Roar';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return Bear;
 }());
 var Cat = /** @class */ (function () {
     function Cat() {
@@ -36,6 +72,13 @@ var Cat = /** @class */ (function () {
     Object.defineProperty(Cat.prototype, "type", {
         get: function () {
             return 'cat';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Cat.prototype, "makeSound", {
+        get: function () {
+            return 'Miauw';
         },
         enumerable: false,
         configurable: true
@@ -62,6 +105,13 @@ var Parrot = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(Parrot.prototype, "makeSound", {
+        get: function () {
+            return 'I am a pirate';
+        },
+        enumerable: false,
+        configurable: true
+    });
     return Parrot;
 }());
 var Zoo = /** @class */ (function () {
@@ -78,24 +128,14 @@ var Zoo = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Zoo.prototype.makeSound = function (animal) {
-        switch (animal.type) {
-            case 'cat':
-                return 'Miauw';
-            case 'dog':
-                return 'Woef';
-            case 'parrot':
-                return 'I am a pirate';
-            default:
-                throw new Error('Unknown type: ' + animal.type);
-        }
-    };
     return Zoo;
 }());
 var zoo = new Zoo;
 zoo.addAnimal(new Cat);
 zoo.addAnimal(new Dog);
 zoo.addAnimal(new Parrot);
+zoo.addAnimal(new Bear);
+//don't put () after animal.makeSound!
 zoo.animals.forEach(function (animal) {
-    document.querySelector('#target').innerHTML += (animal.type + ": " + zoo.makeSound(animal) + "<br>");
+    document.querySelector('#target').innerHTML += (animal.type + ": " + animal.makeSound + "<br>");
 });
