@@ -7,7 +7,6 @@ interface Discount {
 
     apply(price : number) : number;
     showCalculation(price : number) : string;
-
 }
 
 class VariableDiscount implements Discount {
@@ -32,9 +31,45 @@ class VariableDiscount implements Discount {
 }
 
 class FixedDiscount implements Discount {
-    _type: discountType = "variable";
+    _type: discountType = "fixed";
     _value: number;
 
+    constructor(value : number = 0) {
+        this._value = value;
+
+        if(this._type != 'none' && value <= 0) {
+            throw new Error('You cannot create a '+ this._type + ' discount with a negative value');
+        }
+    }
+
+    apply(price: number): number {
+        return Math.max(0, price - this._value);
+    }
+
+    showCalculation(price: number): string {
+        return price + "€ -  "+ this._value +"€ (min 0 €)";
+    }
+}
+
+class NoDiscount implements Discount {
+    _type: discountType = "none";
+    _value: number;
+
+    constructor(value : number = 0) {
+        this._value = value;
+
+        if(this._type != 'none' && value <= 0) {
+            throw new Error('You cannot create a '+ this._type + ' discount with a negative value');
+        }
+    }
+
+    apply(price: number): number {
+        return price;
+    }
+
+    showCalculation(price: number): string {
+        return "No discount";
+    }
 }
 
 /*
@@ -84,9 +119,9 @@ class Discounts {
 
 
 class Product {
-    private _name : string;
-    private _price : number;
-    private _discount : Discount;
+    private readonly _name : string;
+    private readonly _price : number;
+    private readonly _discount : Discount;
 
     constructor(name: string, price: number, discount: Discount) {
         this._name = name;
@@ -131,10 +166,10 @@ class shoppingBasket {
 }
 
 let cart = new shoppingBasket();
-cart.addProduct(new Product('Chair', 25, new VariableDiscount(10)));
-//cart.addProduct(new Product('Chair', 25, new Discount("fixed", -10)));
-/*cart.addProduct(new Product('Table', 50, new Discount("variable", 25)));
-cart.addProduct(new Product('Bed', 100, new Discount("none")));*/
+cart.addProduct(new Product('Chair', 25, new FixedDiscount(10)));
+cart.addProduct(new Product('Lamp', 40, new FixedDiscount(15)));
+cart.addProduct(new Product('Table', 50, new VariableDiscount(25)));
+cart.addProduct(new Product('Bed', 100, new NoDiscount()));
 
 const tableElement = document.querySelector('#cart tbody');
 cart.products.forEach((product) => {

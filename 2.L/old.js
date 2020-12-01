@@ -16,10 +16,38 @@ var VariableDiscount = /** @class */ (function () {
     return VariableDiscount;
 }());
 var FixedDiscount = /** @class */ (function () {
-    function FixedDiscount() {
-        this._type = "variable";
+    function FixedDiscount(value) {
+        if (value === void 0) { value = 0; }
+        this._type = "fixed";
+        this._value = value;
+        if (this._type != 'none' && value <= 0) {
+            throw new Error('You cannot create a ' + this._type + ' discount with a negative value');
+        }
     }
+    FixedDiscount.prototype.apply = function (price) {
+        return Math.max(0, price - this._value);
+    };
+    FixedDiscount.prototype.showCalculation = function (price) {
+        return price + "€ -  " + this._value + "€ (min 0 €)";
+    };
     return FixedDiscount;
+}());
+var NoDiscount = /** @class */ (function () {
+    function NoDiscount(value) {
+        if (value === void 0) { value = 0; }
+        this._type = "none";
+        this._value = value;
+        if (this._type != 'none' && value <= 0) {
+            throw new Error('You cannot create a ' + this._type + ' discount with a negative value');
+        }
+    }
+    NoDiscount.prototype.apply = function (price) {
+        return price;
+    };
+    NoDiscount.prototype.showCalculation = function (price) {
+        return "No discount";
+    };
+    return NoDiscount;
 }());
 /*
 class Discounts {
@@ -120,10 +148,10 @@ var shoppingBasket = /** @class */ (function () {
     return shoppingBasket;
 }());
 var cart = new shoppingBasket();
-cart.addProduct(new Product('Chair', 25, new VariableDiscount(10)));
-//cart.addProduct(new Product('Chair', 25, new Discount("fixed", -10)));
-/*cart.addProduct(new Product('Table', 50, new Discount("variable", 25)));
-cart.addProduct(new Product('Bed', 100, new Discount("none")));*/
+cart.addProduct(new Product('Chair', 25, new FixedDiscount(10)));
+cart.addProduct(new Product('Lamp', 40, new FixedDiscount(15)));
+cart.addProduct(new Product('Table', 50, new VariableDiscount(25)));
+cart.addProduct(new Product('Bed', 100, new NoDiscount()));
 var tableElement = document.querySelector('#cart tbody');
 cart.products.forEach(function (product) {
     var tr = document.createElement('tr');
