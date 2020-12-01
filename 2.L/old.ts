@@ -1,7 +1,44 @@
 //This is called a Union, the discountType can only contain the following 2 values:
 type discountType = "variable" | "fixed" | "none";
 
-class Discount {
+interface Discount {
+    _type: discountType;
+    _value: number;
+
+    apply(price : number) : number;
+    showCalculation(price : number) : string;
+
+}
+
+class VariableDiscount implements Discount {
+    _type: discountType = "variable";
+    _value: number;
+
+    constructor(value : number = 0) {
+        this._value = value;
+
+        if(this._type != 'none' && value <= 0) {
+            throw new Error('You cannot create a '+ this._type + ' discount with a negative value');
+        }
+    }
+
+    apply(price: number): number {
+        return (price - (price * this._value / 100));
+    }
+
+    showCalculation(price: number): string {
+        return price + " € -  "+ this._value +"%";
+    }
+}
+
+class FixedDiscount implements Discount {
+    _type: discountType = "variable";
+    _value: number;
+
+}
+
+/*
+class Discounts {
     private _type: discountType;
     private _value: number;
 
@@ -43,6 +80,8 @@ class Discount {
         }
     }
 }
+*/
+
 
 class Product {
     private _name : string;
@@ -92,10 +131,10 @@ class shoppingBasket {
 }
 
 let cart = new shoppingBasket();
-cart.addProduct(new Product('Chair', 25, new Discount("fixed", 10)));
+cart.addProduct(new Product('Chair', 25, new VariableDiscount(10)));
 //cart.addProduct(new Product('Chair', 25, new Discount("fixed", -10)));
-cart.addProduct(new Product('Table', 50, new Discount("variable", 25)));
-cart.addProduct(new Product('Bed', 100, new Discount("none")));
+/*cart.addProduct(new Product('Table', 50, new Discount("variable", 25)));
+cart.addProduct(new Product('Bed', 100, new Discount("none")));*/
 
 const tableElement = document.querySelector('#cart tbody');
 cart.products.forEach((product) => {
