@@ -7,6 +7,18 @@ interface UserAuth {
     getFacebookLogin(token : string) : boolean;
 }
 
+interface AdminAuth {
+    checkPassword(password: string) : boolean;
+    resetPassword();
+}
+
+interface GoogleAuth {
+    checkPassword(password: string) : boolean;
+    resetPassword();
+    setGoogleToken(token : string);
+    checkGoogleLogin(token : string) : boolean;
+}
+
 class User implements UserAuth {
     private _password : string = 'user';
     private _facebookToken : string;
@@ -41,27 +53,11 @@ class User implements UserAuth {
 }
 
 //admin cannot use google or facebook token
-class Admin implements UserAuth {
+class Admin implements AdminAuth {
     private _password : string = 'admin';
-
-    checkGoogleLogin(token: string): boolean {
-        return false;
-    }
 
     checkPassword(password: string): boolean {
         return (password === this._password);
-    }
-
-    getFacebookLogin(token: string): boolean {
-        return false;
-    }
-
-    setFacebookToken() {
-        throw new Error('Function not supported for admins');
-    }
-
-    setGoogleToken() {
-        throw new Error('Function not supported for admins');
     }
 
     resetPassword() {
@@ -69,7 +65,29 @@ class Admin implements UserAuth {
     }
 }
 
-// class GoogleBot implements UserAuth {}
+class GoogleBot implements GoogleAuth {
+    private _password : string = 'google';
+    private _googleToken : string;
+
+    //Interesting detail here: while I did not define a return type or param type, any deviation from the interface will give you an error.
+    // Test it out by uncommenting the code below.
+    checkGoogleLogin(token) {
+        // return "this will not work";
+        return (token === this._googleToken);
+    }
+
+    setGoogleToken(token : string) {
+        this._googleToken = token;
+    }
+
+    checkPassword(password: string) : boolean {
+        return (password === this._password);
+    }
+
+    resetPassword() {
+        this._password = prompt('What is your new password?');
+    }
+}
 
 const passwordElement = <HTMLInputElement>document.querySelector('#password');
 const typePasswordElement = <HTMLInputElement>document.querySelector('#typePassword');
@@ -80,6 +98,7 @@ const resetPasswordElement = <HTMLAnchorElement>document.querySelector('#resetPa
 
 let guest = new User;
 let admin = new Admin;
+let google = new GoogleBot;
 
 document.querySelector('#login-form').addEventListener('submit', (event) => {
     event.preventDefault();
@@ -87,8 +106,8 @@ document.querySelector('#login-form').addEventListener('submit', (event) => {
     let user = loginAsAdminElement.checked ? admin : guest;
 
     if(!loginAsAdminElement.checked) {
-        user.setGoogleToken('secret_token_google');
-        user.setFacebookToken('secret_token_fb');
+        guest.setGoogleToken('secret_token_google');
+        guest.setFacebookToken('secret_token_fb');
     }
     debugger;
 
@@ -98,11 +117,11 @@ document.querySelector('#login-form').addEventListener('submit', (event) => {
             auth = user.checkPassword(passwordElement.value);
             break;
         case typeGoogleElement.checked:
-            auth = user.checkGoogleLogin('secret_token_google');
+            auth = guest.checkGoogleLogin('secret_token_google');
             break;
         case typeFacebookElement.checked:
             debugger;
-            auth = user.getFacebookLogin('secret_token_fb');
+            auth = guest.getFacebookLogin('secret_token_fb');
             break;
     }
 
