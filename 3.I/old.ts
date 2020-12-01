@@ -1,10 +1,8 @@
 interface UserAuth {
     checkPassword(password: string) : boolean;
     resetPassword();
-    setGoogleToken(token : string);
-    checkGoogleLogin(token : string) : boolean;
-    setFacebookToken(token : string);
-    getFacebookLogin(token : string) : boolean;
+    setSocialToken(token : string);
+    getSocialToken(token : string) : boolean;
 }
 
 interface AdminAuth {
@@ -15,32 +13,23 @@ interface AdminAuth {
 interface GoogleAuth {
     checkPassword(password: string) : boolean;
     resetPassword();
-    setGoogleToken(token : string);
-    checkGoogleLogin(token : string) : boolean;
+    setSocialToken(token : string);
+    getSocialToken(token : string) : boolean;
 }
 
 class User implements UserAuth {
     private _password : string = 'user';
-    private _facebookToken : string;
-    private _googleToken : string;
+    private _socialToken : string;
 
     //Interesting detail here: while I did not define a return type or param type, any deviation from the interface will give you an error.
     // Test it out by uncommenting the code below.
-    checkGoogleLogin(token) {
+    getSocialToken(token) {
         // return "this will not work";
-        return (token === this._googleToken);
+        return (token === this._socialToken);
     }
 
-    setGoogleToken(token : string) {
-        this._googleToken = token;
-    }
-
-    getFacebookLogin(token) {
-        return (token === this._facebookToken);
-    }
-
-    setFacebookToken(token : string) {
-        this._facebookToken = token;
+    setSocialToken(token : string) {
+        this._socialToken = token;
     }
 
     checkPassword(password: string) : boolean {
@@ -67,17 +56,17 @@ class Admin implements AdminAuth {
 
 class GoogleBot implements GoogleAuth {
     private _password : string = 'google';
-    private _googleToken : string;
+    private _socialToken : string;
 
     //Interesting detail here: while I did not define a return type or param type, any deviation from the interface will give you an error.
     // Test it out by uncommenting the code below.
-    checkGoogleLogin(token) {
+    getSocialToken(token) {
         // return "this will not work";
-        return (token === this._googleToken);
+        return (token === this._socialToken);
     }
 
-    setGoogleToken(token : string) {
-        this._googleToken = token;
+    setSocialToken(token : string) {
+        this._socialToken = token;
     }
 
     checkPassword(password: string) : boolean {
@@ -105,9 +94,10 @@ document.querySelector('#login-form').addEventListener('submit', (event) => {
 
     let user = loginAsAdminElement.checked ? admin : guest;
 
-    if(!loginAsAdminElement.checked) {
-        guest.setGoogleToken('secret_token_google');
-        guest.setFacebookToken('secret_token_fb');
+    if(!loginAsAdminElement.checked && typeGoogleElement.checked) {
+        guest.setSocialToken('secret_token_google');
+    } else if (!loginAsAdminElement.checked && typeFacebookElement.checked) {
+        guest.setSocialToken('secret_token_fb');
     }
     debugger;
 
@@ -117,11 +107,11 @@ document.querySelector('#login-form').addEventListener('submit', (event) => {
             auth = user.checkPassword(passwordElement.value);
             break;
         case typeGoogleElement.checked:
-            auth = guest.checkGoogleLogin('secret_token_google');
+            auth = guest.getSocialToken('secret_token_google');
             break;
         case typeFacebookElement.checked:
             debugger;
-            auth = guest.getFacebookLogin('secret_token_fb');
+            auth = guest.getSocialToken('secret_token_fb');
             break;
     }
 
